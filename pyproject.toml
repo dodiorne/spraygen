@@ -1,0 +1,18 @@
+[project]
+name = "spraygen"
+version = "2.0.0"
+description = "Enhanced password generation tool."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "Derek Odiorne", email = "Derek.Odiorne@iFlockConsulting.com" }
+]
+
+dependencies = []
+
+[project.scripts]
+spraygen = "spraygen.generator:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

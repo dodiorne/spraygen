@@ -1400,3 +1400,11 @@ try:
     main()
 except Exception as e:
     print(Fore.RED + "\n[!] Error: " + Style.RESET_ALL + str(e))
+
+
+def main():
+    import sys
+    print("Spraygen password generator running...")
+
+if __name__ == "__main__":
+    main()
