@@ -1,89 +1,175 @@
-# Spraygen
-Password list generator for password spraying - prebaked with goodies
+📘 Spraygen
+Advanced Password Generation Utility for Offensive Security, Red Teams, and Audit Readiness
 
-<p align="center">
-  <img width=400px src="resources/spraygenlogo.png" />
-</p>
+Spraygen is a modernized password generation tool designed to support offensive security assessments, red-team operations, and audit readiness workflows. It produces realistic, policy-aware password candidates based on common enterprise patterns, customizable templates, and controlled randomness.
 
-**Version 1.7**
+Originally created by 3ndG4me, this enhanced version—maintained at github.com/dodiorne/spraygen—includes a fully updated project structure, installer, packaging improvements, and support for modern Python environments.
 
-Generates permutations of Months, Seasons, Years, Sports Teams (NFL, NBA, MLB, NHL), Sports Scores, "Password", and even Iterable Keyspaces of a specified size.
+Spraygen is not a password spraying or authentication attack tool.
+It is strictly a password generator.
 
-All permutations are generated with common attributes appended/prepended (such as "!" or "#"), or custom separators (such as "." or "_").
+🔧 Features
 
-Common letter replacement option (change all A -> 4/@ for example)
+Generates password candidates using:
 
-Users can extend the attributes and separators using comma delimited lists of characters.
+Base words
 
-Spraygen also accepts single words or external wordlists that allow you to generate tuned custom wordlists in addition to what is already provided.
+Years & seasons
 
-You could use tools like crunch, a fancy bash loop over SecLists, or whatever have you but that takes time...this one is made for spraying, so get to it!
+Customizable suffixes, prefixes, and special characters
+
+Human-realistic patterns
+
+Supports future template-based generation (e.g., {word}{year}{special})
+
+CLI-friendly output for use in pipelines
+
+Clean Python package layout (pip install, pipx install, or installer script)
+
+Kali Linux–compatible (PEP 668 safe)
+
+Lightweight and dependency-free by design
+
+📦 Installation Options
+
+Spraygen supports multiple installation paths depending on your environment.
+
+Option 1 — Installer Script (Recommended for Kali)
+
+Kali Linux blocks system-wide pip installs by default (PEP 668).
+The installer provides a fully isolated, virtual-environment-based installation.
+
+curl -s https://raw.githubusercontent.com/dodiorne/spraygen/main/install/installer.sh -o installer.sh
+chmod +x installer.sh
+./installer.sh
 
 
-```
-python3 spraygen.py -h
-     _
-    (  \_
-    (    \_
-    (       \_  
-    (         \_            ___
-    ( Password   \         |   |
-    (   Spray     |คคคคคคคค|___|
-    (           _ /          |
-    (       _ /         /~~~~~~~~~\
-    (   _ /            (  Spray    )
-    (_/                 |  This   |
-                        |         |
-                        | Get     |
-                        |  Creds  |
-                        |_________|
+Once installed, run:
 
-    Original Art by Alex Chudnovsky (Unaffiliated)
-    Spraygen tool by 3ndG4me
-    Version 1.7
-    
-usage: spraygen.py [-h] [--year_start YEAR_START] [--year_end YEAR_END] [-s separators] [-a attributes] [-w wordlist] [-n single word] [--mode {all,nosep,noattr,years,plain,letter,quick,custom}]
-                   [--type {all,iterative,sports,nfl,nba,mlb,nhl,months,seasons,password,common,short,custom} [{all,iterative,sports,nfl,nba,mlb,nhl,months,seasons,password,common,short,custom} ...]]
-                   [--iter {ascii,num,spec,asciinum,asciispec,numspec,full}] [--size SIZE] [--min_length MIN_LENGTH] [--max_length MAX_LENGTH] [-o output file] [-p] [--sort {nosort,asc,desc,random}] [-v]
+spraygen --help
 
-Parse Spray List Arguments.
+Option 2 — pipx Installation
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --year_start YEAR_START
-                        starting year for a range of years
-  --year_end YEAR_END   ending year for a range of years
-  -s separators         a comma delimited list of one or more separators
-  -a attributes         a comma delimited list of one or more attributes
-  -w wordlist           path to a custom wordlist
-  -n single word        single custom word to generate a custom wordlist with
-  --mode {all,nosep,noattr,years,plain,letter,quick,custom}
-                        Mode for list generation. Can be all, no separators, no attributes, only years, plain, letter, quick, or custom (will only use parameters passed into -s or -a).
-  --type {all,iterative,sports,nfl,nba,mlb,nhl,months,seasons,password,common,short,custom} [{all,iterative,sports,nfl,nba,mlb,nhl,months,seasons,password,common,short,custom} ...]
-                        Type of list to generate. Can be all, iterative, sports, nfl, nba, mlb, nhl, months, seasons, password, common, short, or custom. Choosing 'all' executes all options except for 'iterative' which
-                        must be run manually.
-  --iter {ascii,num,spec,asciinum,asciispec,numspec,full}
-                        Keyspace mode for iterative list generation. Only works when --type is set to 'iterative'. Can be ascii, num, spec, asciinum, asciispec, numspec, or full. Will generate all permutations of the
-                        selected keyspace with a given length set with the --size parameter.
-  --size SIZE           Length of passwords generated by a set keyspace. Only works when --type is set to 'iterative' and an --iter keyspace mode is set.
-  --min_length MIN_LENGTH
-                        Minimum length of passwords to include in the list. (Default: 1)
-  --max_length MAX_LENGTH
-                        Maximum length of passwords to include in the list (Default: 999)
-  -o output file        name of a file to create and write the final output to
-  -p                    prints the output line by line as plaintext
-  --sort {nosort,asc,desc,random}
-                        Sort final output. Sorting methods supported are nosort, asc, desc, random.
-  -v                    prints the current version of spraygen and exits
-  ```
+If pipx is available:
 
-  ## Basic Usage
-  1. Install dependencies `pip3 install -r requirements.txt`
-  2. Run `python3 spraygen.py -p` - this will generate all default built in wordlists with all permutations and print them to the screen
+pipx install git+https://github.com/dodiorne/spraygen.git
 
-  ## Usage Recommendations
-  - [Usage Docs](docs/usage.md)
+Option 3 — Local Development Install
+git clone https://github.com/dodiorne/spraygen.git
+cd spraygen
+pip install .
 
-  ## Credits
-  - [@MarkoH17](https://github.com/MarkoH17) - for the boolean python3.8 backwards compatibility fix
-  - [@absolomb](https://github.com/absolomb) - for enhancing type selection and attribute logic in year generation
+▶️ Usage
+
+Spraygen will evolve to support extended flags in Spraygen v2.
+The current CLI provides a standardized entrypoint:
+
+spraygen
+
+
+Example usage for future enhancements (placeholder):
+
+spraygen --words words.txt --years 2020-2025 --specials "!@#" --output passwords.txt
+
+
+Output can be piped into other tools:
+
+spraygen | sort -u | tee gen.txt
+
+🗂 Project Structure
+spraygen/
+    generator.py        # Core logic
+    __init__.py
+install/
+    installer.sh        # Virtualenv-based installer
+tests/
+pyproject.toml          # Modern Python build format
+requirements.txt
+README.md
+
+🧪 Development
+
+Clone your fork:
+
+git clone https://github.com/dodiorne/spraygen.git
+cd spraygen
+
+
+Install locally:
+
+pip install -e .
+
+
+Run generator:
+
+spraygen
+
+🤝 Contributing
+
+Contributions are welcome. The most valuable additions include:
+
+Parameterized password generation logic
+
+Additional pattern libraries
+
+Template-based model (e.g., {{word}}{{year}}{{special}})
+
+Entropy scoring
+
+JSON/CSV export options
+
+Unit tests for reproducibility
+
+Packaging and CI improvements
+
+Submit pull requests to:
+
+https://github.com/dodiorne/spraygen/pulls
+
+🛣 Roadmap
+v2.0.x
+
+Full argparse-driven CLI
+
+Wordlist support (--words)
+
+Leetspeak transformations (--leet)
+
+Enterprise password policy modeling
+
+Season-based mutations (Winter2024!)
+
+Output file support (--output file.txt)
+
+Pipeline-friendly modes
+
+Entropy scoring and strength classification
+
+v2.1+
+
+Template engine for custom password formats
+
+Markov chain–based generation modes
+
+“Business realism” modeling using company themes
+
+Pluggable generator modules
+
+🔒 Security Notice
+
+Spraygen generates password candidates for legitimate security assessments, audit readiness, and internal red-team operations.
+It must only be used with explicit authorization.
+
+iFlock Security Consulting does not endorse unauthorized access or misuse of this tool.
+
+📄 License
+
+Spraygen retains the open-source license structure of the original project.
+See: LICENSE in the repository.
+
+⭐ Acknowledgements
+
+Original tool by: 3ndG4me
+Modernization, enhancements, installer, and ongoing development by:
+Derek Odiorne / iFlock Security Consulting
+https://github.com/dodiorne/spraygen
