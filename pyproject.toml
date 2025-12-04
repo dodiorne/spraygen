@@ -8,7 +8,10 @@ authors = [
   { name = "Derek Odiorne", email = "Derek.Odiorne@iFlockConsulting.com" }
 ]
 
-dependencies = []
+dependencies = [
+    "colorama>=0.4.0",
+    "progress>=1.6"
+]
 
 [project.scripts]
 spraygen = "spraygen.generator:main"
@@ -19,4 +22,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["spraygen"]
-exclude = ["install", "resources"]
+exclude = ["install", "resources", "docs", "build"]
