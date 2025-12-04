@@ -1,175 +1,175 @@
-📘 Spraygen
+Spraygen
+
 Advanced Password Generation Utility for Offensive Security, Red Teams, and Audit Readiness
 
 Spraygen is a modernized password generation tool designed to support offensive security assessments, red-team operations, and audit readiness workflows. It produces realistic, policy-aware password candidates based on common enterprise patterns, customizable templates, and controlled randomness.
 
-Originally created by 3ndG4me, this enhanced version—maintained at github.com/dodiorne/spraygen—includes a fully updated project structure, installer, packaging improvements, and support for modern Python environments.
+Originally created by 3ndG4me, this enhanced version—maintained at github.com/dodiorne/spraygen—includes a fully updated project structure, packaging improvements, and a Kali-compliant installer.
 
 Spraygen is not a password spraying or authentication attack tool.
 It is strictly a password generator.
 
-🔧 Features
+Features
 
 Generates password candidates using:
 
 Base words
 
-Years & seasons
+Years and season-based patterns
 
-Customizable suffixes, prefixes, and special characters
+Custom suffixes, prefixes, and special characters
 
-Human-realistic patterns
-
-Supports future template-based generation (e.g., {word}{year}{special})
+Realistic enterprise password behaviors
 
 CLI-friendly output for use in pipelines
 
-Clean Python package layout (pip install, pipx install, or installer script)
+Modern Python project structure (pip install, pipx install, installer support)
 
-Kali Linux–compatible (PEP 668 safe)
+Kali Linux compatible (PEP 668 safe)
 
-Lightweight and dependency-free by design
+Lightweight and dependency-minimal
 
-📦 Installation Options
+Installation
 
 Spraygen supports multiple installation paths depending on your environment.
 
-Option 1 — Installer Script (Recommended for Kali)
+Option 1: Installer Script (Recommended for Kali Linux)
 
-Kali Linux blocks system-wide pip installs by default (PEP 668).
-The installer provides a fully isolated, virtual-environment-based installation.
+The installer provides a fully isolated, virtual-environment-based installation that avoids Kali’s PEP 668 restrictions.
+
+Run:
 
 curl -s https://raw.githubusercontent.com/dodiorne/spraygen/main/install/installer.sh -o installer.sh
 chmod +x installer.sh
 ./installer.sh
 
 
-Once installed, run:
+Once installed:
 
 spraygen --help
 
-Option 2 — pipx Installation
+Option 2: pipx Installation
 
-If pipx is available:
+If pipx is installed:
 
 pipx install git+https://github.com/dodiorne/spraygen.git
 
-Option 3 — Local Development Install
+Option 3: Local Development Installation
 git clone https://github.com/dodiorne/spraygen.git
 cd spraygen
 pip install .
 
-▶️ Usage
+Usage
 
-Spraygen will evolve to support extended flags in Spraygen v2.
-The current CLI provides a standardized entrypoint:
+Spraygen v2 will expand capabilities significantly.
+Current CLI entrypoint:
 
 spraygen
 
 
-Example usage for future enhancements (placeholder):
+Example usage for upcoming features (placeholder):
 
 spraygen --words words.txt --years 2020-2025 --specials "!@#" --output passwords.txt
 
 
-Output can be piped into other tools:
+Pipeline example:
 
-spraygen | sort -u | tee gen.txt
+spraygen | sort -u | tee generated.txt
 
-🗂 Project Structure
+Project Structure
 spraygen/
-    generator.py        # Core logic
+    generator.py
     __init__.py
 install/
-    installer.sh        # Virtualenv-based installer
+    installer.sh
 tests/
-pyproject.toml          # Modern Python build format
+pyproject.toml
 requirements.txt
 README.md
 
-🧪 Development
+Development
 
-Clone your fork:
+Clone the repository:
 
 git clone https://github.com/dodiorne/spraygen.git
 cd spraygen
 
 
-Install locally:
+Install for development:
 
 pip install -e .
 
 
-Run generator:
+Run:
 
 spraygen
 
-🤝 Contributing
+Contributing
 
-Contributions are welcome. The most valuable additions include:
+Contributions are welcome. Potential improvement areas:
 
-Parameterized password generation logic
+Extended password generation logic
 
-Additional pattern libraries
+Improved argument parsing and CLI options
 
-Template-based model (e.g., {{word}}{{year}}{{special}})
+Template-based password construction
 
-Entropy scoring
+Wordlist integration
 
-JSON/CSV export options
+Entropy scoring and classification
 
-Unit tests for reproducibility
+JSON/CSV output modes
+
+Unit tests
 
 Packaging and CI improvements
 
-Submit pull requests to:
+Submit pull requests at:
 
 https://github.com/dodiorne/spraygen/pulls
 
-🛣 Roadmap
+Roadmap
 v2.0.x
 
-Full argparse-driven CLI
+Argument parsing with argparse
 
 Wordlist support (--words)
 
 Leetspeak transformations (--leet)
 
-Enterprise password policy modeling
+Password policy modeling
 
-Season-based mutations (Winter2024!)
+Season and year combinations
 
-Output file support (--output file.txt)
+Output file support (--output)
 
-Pipeline-friendly modes
+Pipeline-friendly output
 
-Entropy scoring and strength classification
+Entropy scoring
 
 v2.1+
 
-Template engine for custom password formats
+Template engine (e.g., {word}{year}{special})
 
-Markov chain–based generation modes
+Markov chain generation
 
-“Business realism” modeling using company themes
+Business-relevance modeling
 
-Pluggable generator modules
+Modular generator plugins
 
-🔒 Security Notice
+Security Notice
 
-Spraygen generates password candidates for legitimate security assessments, audit readiness, and internal red-team operations.
-It must only be used with explicit authorization.
+Spraygen generates password candidates for legitimate security assessments, audits, and authorized testing.
+Unauthorized use is strictly prohibited.
 
-iFlock Security Consulting does not endorse unauthorized access or misuse of this tool.
+License
 
-📄 License
+See the LICENSE file in the repository.
 
-Spraygen retains the open-source license structure of the original project.
-See: LICENSE in the repository.
+Acknowledgments
 
-⭐ Acknowledgements
+Original author: 3ndG4me
 
-Original tool by: 3ndG4me
-Modernization, enhancements, installer, and ongoing development by:
-Derek Odiorne / iFlock Security Consulting
-https://github.com/dodiorne/spraygen
+Modernization, enhancements, and ongoing development: Derek Odiorne / iFlock Security Consulting
+
+Repository: https://github.com/dodiorne/spraygen
