@@ -1111,25 +1111,18 @@ def generate_all(year_start, year_end):
 def main():
 
     banner = '''
-     _
-    (  \_
-    (    \_
-    (       \_  
-    (         \_            ___
-    ( Password   \         |   |
-    (   Spray     |คคคคคคคค|___|
-    (           _ /          |
-    (       _ /         /~~~~~~~~~\\
-    (   _ /            (  Spray    )
-    (_/                 |  This   |
-                        |         |
-                        | Get     |
-                        |  Creds  |
-                        |_________|
+ #####                              #####                    #####        ###   
+#     # #####  #####    ##   #   # #     # ###### #    #    #     #      #   #  
+#       #    # #    #  #  #   # #  #       #      ##   #          #     #     # 
+ #####  #    # #    # #    #   #   #  #### #####  # #  #     #####      #     # 
+      # #####  #####  ######   #   #     # #      #  # #    #       ### #     # 
+#     # #      #   #  #    #   #   #     # #      #   ##    #       ###  #   #  
+ #####  #      #    # #    #   #    #####  ###### #    #    ####### ###   ###   
+                                                                                
 
-    Original Art by Alex Chudnovsky (Unaffiliated)
-    Spraygen tool by 3ndG4me
-    Version 1.7
+    Art by ChatGPT
+    Spraygen tool by iFlock Security Consulting
+    Version 2.0
     '''
 
     print(Fore.BLUE + banner + Style.RESET_ALL)
