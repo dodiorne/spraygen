@@ -1148,7 +1148,7 @@ def main():
     args = parser.parse_args()
 
     if args.v:
-        print("Spraygen Version: 1.6")
+        print("Spraygen Version: 2.0")
         return
 
     if args.year_start == None:
