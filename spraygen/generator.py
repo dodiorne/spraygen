@@ -9,6 +9,7 @@ import time
 from progress.bar import Bar
 import threading
 import random
+from pathlib import Path
 
 # Global start time to keep track of process running time
 start_time = time.time()
@@ -336,6 +337,47 @@ spray_list_index = 0
 max_length = 999
 min_length = 1
 
+MAX_ITERATIVE_SIZE = 6
+BASE_IO_DIR = Path.cwd().resolve()
+
+def _resolve_safe_path(raw_path: str, *, purpose: str) -> Path:
+    path = Path(raw_path).expanduser()
+    candidate = (BASE_IO_DIR / path) if not path.is_absolute() else path
+    resolved = candidate.resolve()
+
+    if BASE_IO_DIR not in resolved.parents and resolved != BASE_IO_DIR:
+        raise ValueError(f"{purpose} must be inside {BASE_IO_DIR}")
+
+    for parent in (candidate, *candidate.parents):
+        if parent.is_symlink():
+            raise ValueError(f"Refusing to use symlink for {purpose}: {parent}")
+
+    return resolved
+
+def _load_custom_wordlist(path_str):
+    target = _resolve_safe_path(path_str, purpose="Custom wordlist")
+    if not target.exists():
+        raise FileNotFoundError(f"Custom wordlist not found: {target}")
+    if not target.is_file():
+        raise ValueError(f"Custom wordlist must be a file: {target}")
+    lines = target.read_text(encoding='utf-8').splitlines()
+    bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Progress", suffix='%(percent)d%%', max=len(lines))
+    cleaned = []
+    for item in lines:
+        cleaned.append(item.strip())
+        bar.next()
+    bar.finish()
+    return list(filter(None, cleaned))
+
+def _prepare_output_file(path_str):
+    target = _resolve_safe_path(path_str, purpose="Output file")
+    if target.exists():
+        raise FileExistsError(f"Refusing to overwrite existing output file: {target}")
+    if target.is_dir():
+        raise IsADirectoryError(f"Output path is a directory: {target}")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    return target
+
 # Instead of "appending" directly we manually add in based on the global index, check if something exists already, add it if it doesn't and increment the global key
 def update_spray_list(item):
     global spray_list_index
@@ -349,63 +391,42 @@ def update_spray_list(item):
         spray_list_index += 1
 
 
+def _iterative_keyspace(mode):
+    mapping = {
+        "ascii": ascii_keyspace,
+        "num": numeral_keyspace,
+        "spec": special_keyspace,
+        "asciinum": ascii_numeral_keyspace,
+        "asciispec": ascii_special_keyspace,
+        "numspec": numeral_special_keyspace,
+        "full": full_keyspace,
+    }
+    try:
+        return mapping[mode]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported keyspace mode: {mode}") from exc
+
+
 def generate_keyspace_list(mode, size, year_start, year_end):
-    if mode == "ascii":
-        ascii_items = list(itertools.product(ascii_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(ascii_items))
-        for item in ascii_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "num":
-        num_items = list(itertools.product(numeral_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(num_items))
-        for item in num_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "spec":
-        spec_items = list(itertools.product(special_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(spec_items))
-        for item in spec_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "asciinum":
-        asciinum_items = list(itertools.product(ascii_numeral_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(asciinum_items))
-        for item in asciinum_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "asciispec":
-        asciispec_items = list(itertools.product(ascii_special_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(asciispec_items))
-        for item in asciispec_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "numspec":
-        numspec_items = list(itertools.product(numeral_special_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(numspec_items))
-        for item in numspec_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
-    elif mode == "full":
-        full_items = list(itertools.product(full_keyspace, repeat=size))
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Generating " + mode + " keyspace list", suffix='%(percent)d%%', max=len(full_items))
-        for item in full_items:
-            update_spray_list(''.join(item))
-            generate_years(''.join(item), year_start, year_end)
-            bar.next()
-        bar.finish()
+    if size > MAX_ITERATIVE_SIZE:
+        raise ValueError(
+            f"Iterative generation size {size} exceeds maximum allowed ({MAX_ITERATIVE_SIZE})."
+        )
+
+    keyspace = _iterative_keyspace(mode)
+    total = len(keyspace) ** size
+    bar = Bar(
+        Fore.BLUE + "[*] Info: " + Style.RESET_ALL + f"Generating {mode} keyspace list",
+        suffix='%(percent)d%%',
+        max=total,
+    )
+
+    for item in itertools.product(keyspace, repeat=size):
+        candidate = ''.join(item)
+        update_spray_list(candidate)
+        generate_years(candidate, year_start, year_end)
+        bar.next()
+    bar.finish()
 
 
 def generate_custom(year_start, year_end):
@@ -1189,20 +1210,13 @@ def main():
         print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL +  "--- custom attributes added in %s seconds ---" % (time.time() - start_time))
     if args.w != None:
         print(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Creating custom wordlist...")
-        fileSize = open(args.w, "r")
-        bar = Bar(Fore.BLUE + "[*] Info: " + Style.RESET_ALL + "Progress", suffix='%(percent)d%%', max=len(fileSize.readlines()))
-        fileSize.close()
-
         global custom_wordlist
-
-        customFile = open(args.w, "r")
-        for item in customFile:
-            custom_wordlist.append(item.strip())
-            bar.next()
-        customFile.close()
-        bar.finish()
-        # Filter any blank lines
-        custom_wordlist = list(filter(None, custom_wordlist))
+        try:
+            custom_wordlist.clear()
+            custom_wordlist.extend(_load_custom_wordlist(args.w))
+        except (OSError, ValueError) as exc:
+            print(Fore.RED + "[!] Error: " + Style.RESET_ALL + str(exc))
+            return
 
         print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL +  "--- custom wordlist loaded in %s seconds ---" % (time.time() - start_time))
     if args.n != None:
@@ -1371,14 +1385,20 @@ def main():
 
 
     if args.o != None:
-        print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL + "Writing output to: " + args.o)
-        f = open(args.o, "a")
-        bar = Bar(Fore.GREEN + "[*] Success: " + Style.RESET_ALL + "Progress", suffix='%(percent)d%%', max=len(final_list))
-        for password in final_list:
-            f.write(password + "\n")
-            bar.next()
-        f.close()
-        bar.finish()
+        try:
+            output_path = _prepare_output_file(args.o)
+        except (OSError, ValueError) as exc:
+            print(Fore.RED + "[!] Error: " + Style.RESET_ALL + str(exc))
+            return
+
+        print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL + "Writing output to: " + str(output_path))
+        with output_path.open("x", encoding="utf-8") as f:
+            bar = Bar(Fore.GREEN + "[*] Success: " + Style.RESET_ALL + "Progress", suffix='%(percent)d%%', max=len(final_list))
+            for password in final_list:
+                f.write(password + "\n")
+                bar.next()
+            bar.finish()
+
 
     if args.p == True:
         print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL + "Printing final list:")
@@ -1389,15 +1409,10 @@ def main():
     print(Fore.GREEN + "[+] Success: " + Style.RESET_ALL + "Done!")
 
 
-try:
-    main()
-except Exception as e:
-    print(Fore.RED + "\n[!] Error: " + Style.RESET_ALL + str(e))
-
-
-def main():
-    import sys
-    print("Spraygen password generator running...")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(Fore.RED + "\n[!] Error: " + Style.RESET_ALL + str(e))
+        raise
